@@ -4,6 +4,7 @@
 
 namespace uvpp
 {
+    
     namespace text
     {
         struct ci_less : std::binary_function<std::string, std::string, bool>

@@ -5,6 +5,7 @@
 
 namespace uvpp
 {
+	
 	namespace http {
 
 		class url_parse_exception : public uvpp::exception
