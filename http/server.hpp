@@ -9,50 +9,50 @@ namespace uvpp
 
         class Server
         {
-        public:
-            Server()
-                : socket_(new uvpp::Tcp)
-            {
-            }
-
-            virtual ~Server()
-            {
-                if(socket_)
+            public:
+                Server()
+                    : socket_(new uvpp::Tcp)
                 {
-                    socket_->close([](){});
                 }
-            }
 
-        public:
-            static std::shared_ptr<Server> create(const std::string& ip, int port, std::function<void(Request&, Response&)> callback)
-            {
-                auto server = std::shared_ptr<Server>(new Server);
-                if(server->listen(ip, port, callback)) return server;
-                return nullptr;
-            }
-
-            bool listen(const std::string& ip, int port, std::function<void(Request&, Response&)> callback)
-            {
-                if(!socket_->bind(ip, port)) return false;
-
-                if(!socket_->listen([=](error e) {
-                    if(e)
+                virtual ~Server()
+                {
+                    if(socket_)
                     {
-                        // TODO: handle client connection error
+                        socket_->close([](){});
                     }
-                    else
-                    {
-                        auto client = new Context(socket_.get());
-                        client->parse(callback);
-                    }
-                })) return false;
+                }
 
-                return true;
-            }
+            public:
+                static std::shared_ptr<Server> create(const std::string& ip, int port, std::function<void(Request&, Response&)> callback)
+                {
+                    auto server = std::shared_ptr<Server>(new Server);
+                    if(server->listen(ip, port, callback)) return server;
+                    return nullptr;
+                }
 
-        private:
-            std::shared_ptr<uvpp::Tcp> socket_;
-        };
+                bool listen(const std::string& ip, int port, std::function<void(Request&, Response&)> callback)
+                {
+                    if(!socket_->bind(ip, port)) return false;
 
-	}
+                    if(!socket_->listen([=](error e) {
+                        if(e)
+                        {
+                            // TODO: handle client connection error
+                        }
+                        else
+                        {
+                            auto client = new Context(socket_.get());
+                            client->parse(callback);
+                        }
+                    })) return false;
+
+                    return true;
+                }
+
+            private:
+                std::shared_ptr<uvpp::Tcp> socket_;
+            };
+
+        }
 }

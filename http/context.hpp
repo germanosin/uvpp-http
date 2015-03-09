@@ -5,7 +5,6 @@
 
 namespace uvpp
 {
-	
 	namespace http {
 
 		class Context {
@@ -15,19 +14,19 @@ namespace uvpp
 			private:
 				Context(uvpp::Tcp *server) :
 				socket_(nullptr)
-                , parser_()
-                , was_header_value_(true)
-                , last_header_field_()
-                , last_header_value_()
-                , parser_settings_()
-                , request_(nullptr)
-                , response_(nullptr)
-                , callback_lut_(new uvpp::callbacks(1)) {
+		            , parser_()
+		            , was_header_value_(true)
+		            , last_header_field_()
+		            , last_header_value_()
+		            , parser_settings_()
+		            , request_(nullptr)
+		            , response_(nullptr)
+		            , callback_lut_(new uvpp::callbacks(1)) {
 
-                	assert(server);
+		            	assert(server);
 
-                	socket_ = std::shared_ptr<uvpp::Tcp> (new uvpp::Tcp);
-                	server->accept(*socket_.get());
+		            	socket_ = std::shared_ptr<uvpp::Tcp> (new uvpp::Tcp);
+		            	server->accept(*socket_.get());
 
 				}
 

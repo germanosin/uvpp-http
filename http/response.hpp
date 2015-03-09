@@ -9,7 +9,6 @@ namespace uvpp
 {
 	namespace http {
 		
-
 		class Context;
 
 		typedef std::shared_ptr<Context> http_client_ptr;
@@ -59,86 +58,86 @@ namespace uvpp
 		};	
 
 		class response_exception : public uvpp::exception
-        {
-        public:
-            response_exception(const std::string& message="HTTP respsonse error.")
-                : uvpp::exception(message)
-            {}
-        };	
+		      {
+		      public:
+		          response_exception(const std::string& message="HTTP respsonse error.")
+		              : uvpp::exception(message)
+		          {}
+		      };	
 
-		class Response {
+			class Response {
 
-			friend class Context;
+				friend class Context;
 
-			private:
-				Response(Context* client, uvpp::Tcp* socket)
-				    : client_(client)
-				    , socket_(socket)
-				    , headers_()
-				    , status_(200)
-				{
-				    headers_["Content-Type"] = "text/html";
-				}
+				private:
+					Response(Context* client, uvpp::Tcp* socket)
+					    : client_(client)
+					    , socket_(socket)
+					    , headers_()
+					    , status_(200)
+					{
+					    headers_["Content-Type"] = "text/html";
+					}
 
-				~Response()
-				{}
+					~Response()
+					{}
 
-			public:
-			    bool end(const std::string& body)
-			    {
-			        // Content-Length
-			        if(headers_.find("Content-Length") == headers_.end())
-			        {
-			            std::stringstream ss;
-			            ss << body.length();
-			            headers_["Content-Length"] = ss.str();
-			        }
+				public:
+				    bool end(const std::string& body)
+				    {
+				        // Content-Length
+				        if(headers_.find("Content-Length") == headers_.end())
+				        {
+				            std::stringstream ss;
+				            ss << body.length();
+				            headers_["Content-Length"] = ss.str();
+				        }
 
-			        std::stringstream response_text;
-			        response_text << "HTTP/1.1 ";
-			        response_text << status_ << " " << get_status_text(status_) << "\r\n";
-			        for(auto h : headers_)
-			        {
-			            response_text << h.first << ": " << h.second << "\r\n";
-			        }
-			        response_text << "\r\n";
-			        response_text << body;
+				        std::stringstream response_text;
+				        response_text << "HTTP/1.1 ";
+				        response_text << status_ << " " << get_status_text(status_) << "\r\n";
+				        for(auto h : headers_)
+				        {
+				            response_text << h.first << ": " << h.second << "\r\n";
+				        }
+				        response_text << "\r\n";
+				        response_text << body;
 
-			        auto str = response_text.str();
-			        return socket_->write(str.c_str(), static_cast<int>(str.length()), [=](error e) {
-			            if(e)
-			            {
-			                // TODO: handle error
-			            }
-			            // clean up
-			            client_.reset();
-			        });
-			    }
+				        auto str = response_text.str();
+				        return socket_->write(str.c_str(), static_cast<int>(str.length()), [=](error e) {
+				            if(e)
+				            {
+				                // TODO: handle error
+				            }
+				            // clean up
+				            client_.reset();
+				        });
+				    }
 
-			    void set_status(int status_code)
-			    {
-			        status_ = status_code;
-			    }
+				    void set_status(int status_code)
+				    {
+				        status_ = status_code;
+				    }
 
-			    void set_header(const std::string& key, const std::string& value)
-			    {
-			        headers_[key] = value;
-			    }
+				    void set_header(const std::string& key, const std::string& value)
+				    {
+				        headers_[key] = value;
+				    }
 
-			    static std::string get_status_text(int status)
-			    {
-			        auto status_iter = statuses.find(status);
-			        if (status_iter!=statuses.end()) {
-			        	return status_iter->second;
-			        } else
-			        	throw response_exception("Not supported status code.");
-			    }
+				    static std::string get_status_text(int status)
+				    {
+				        auto status_iter = statuses.find(status);
+				        if (status_iter!=statuses.end()) {
+				        	return status_iter->second;
+				        } else
+				        	throw response_exception("Not supported status code.");
+				    }
 
-			private:
-			    http_client_ptr client_;
-			    uvpp::Tcp* socket_;
-			    std::map<std::string, std::string, uvpp::text::ci_less> headers_;
-			    int status_;				
-		};
-	}
+				private:
+				    http_client_ptr client_;
+				    uvpp::Tcp* socket_;
+				    std::map<std::string, std::string, uvpp::text::ci_less> headers_;
+				    int status_;				
+			};
+		}
 }
